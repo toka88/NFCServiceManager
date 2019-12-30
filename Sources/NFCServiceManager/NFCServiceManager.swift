@@ -133,7 +133,7 @@ public final class NFCServiceManager: NSObject {
 
 extension NFCServiceManager: NFCNDEFReaderSessionDelegate {
     public func readerSession(_ session: NFCNDEFReaderSession, didInvalidateWithError error: Error) {
-        print("[\(String(describing: type(of: self)))] readerSession - didInvalidateWithError")
+        debugPrint("[\(String(describing: type(of: self)))] readerSession - didInvalidateWithError")
         session.invalidate()
         DispatchQueue.main.async { [weak self] in
             self?.readerSession = nil
@@ -146,7 +146,7 @@ extension NFCServiceManager: NFCNDEFReaderSessionDelegate {
     }
 
     public func readerSession(_ session: NFCNDEFReaderSession, didDetectNDEFs messages: [NFCNDEFMessage]) {
-        print("[\(String(describing: type(of: self)))] readerSession - didDetectNDEFs")
+        debugPrint("[\(String(describing: type(of: self)))] readerSession - didDetectNDEFs")
         // Scanning NFC tags
         var result = ""
         for payload in messages[0].records {
@@ -160,7 +160,7 @@ extension NFCServiceManager: NFCNDEFReaderSessionDelegate {
 
     @available(iOS 13.0, *)
     public func readerSession(_ session: NFCNDEFReaderSession, didDetect tags: [NFCNDEFTag]) {
-        print("[\(String(describing: type(of: self)))] session - didDetect")
+        debugPrint("[\(String(describing: type(of: self)))] session - didDetect")
         if isScanning {
             if tags.count > 1 {
                 // Restart polling in 500 milliseconds.
@@ -180,7 +180,6 @@ extension NFCServiceManager: NFCNDEFReaderSessionDelegate {
             guard let messageToWrite = messageToWrite else {
                 session.invalidate(errorMessage: NFCServiceError.dataCannotBeWritten.localizedDescription)
                 returnWritingError(NFCServiceError.dataCannotBeWritten)
-                print("Error 1")
                 return
             }
 
@@ -200,7 +199,7 @@ extension NFCServiceManager: NFCNDEFReaderSessionDelegate {
     }
 
     public func readerSessionDidBecomeActive(_ session: NFCNDEFReaderSession) {
-        print("[\(String(describing: type(of: self)))] readerSessionDidBecomeActive")
+        debugPrint("[\(String(describing: type(of: self)))] readerSessionDidBecomeActive")
     }
 
     @available(iOS 13.0, *)
@@ -254,7 +253,6 @@ extension NFCServiceManager: NFCNDEFReaderSessionDelegate {
                 if let error = error {
                     session.invalidate(errorMessage: NFCServiceError.unableToQueryTheNDEFStatusOfTag.localizedDescription)
                     self?.returnWritingError(error)
-                    print("Error 3")
                     return
                 }
 
@@ -262,21 +260,17 @@ extension NFCServiceManager: NFCNDEFReaderSessionDelegate {
                 case .notSupported:
                     session.invalidate(errorMessage: NFCServiceError.tagIsNotNDEFCompilant.localizedDescription)
                     self?.returnWritingError(NFCServiceError.tagIsNotNDEFCompilant)
-                    print("Error 4")
                 case .readOnly:
                     session.invalidate(errorMessage: NFCServiceError.readOnlyTag.localizedDescription)
                     self?.returnWritingError(NFCServiceError.readOnlyTag)
-                    print("Error 5")
                 case .readWrite:
                     tag.writeNDEF(message, completionHandler: { [weak self] error in
                         if let error = error {
-                            print("[\(String(describing: type(of: self)))] Write NDEF message fail: \(error)")
+                            debugPrint("[\(String(describing: type(of: self)))] Write NDEF message fail: \(error)")
                             session.invalidate(errorMessage: "Write NDEF message fail: \(error.localizedDescription)")
                             self?.returnWritingError(error)
-
-                            print("Error 6")
                         } else {
-                            print("[\(String(describing: type(of: self)))] Write NDEF message successful.")
+                            debugPrint("[\(String(describing: type(of: self)))] Write NDEF message successful.")
                             session.alertMessage = "Write NDEF message successful."
                             self?.returnWritingSuccess()
                         }
@@ -284,7 +278,6 @@ extension NFCServiceManager: NFCNDEFReaderSessionDelegate {
                 @unknown default:
                     session.invalidate(errorMessage: NFCServiceError.unknownNDEFTagStatus.localizedDescription)
                     self?.returnWritingError(NFCServiceError.unknownNDEFTagStatus)
-                    print("Error 7")
                 }
             })
         })
@@ -330,7 +323,7 @@ extension NFCServiceManager: NFCNDEFReaderSessionDelegate {
 
     @available(iOS 13.0, *)
     private func restartPolling(session: NFCNDEFReaderSession, alertMessage: String?) {
-        print("\(String(describing: type(of: self))) restartPolling")
+        debugPrint("\(String(describing: type(of: self))) restartPolling")
         if let message = alertMessage {
             session.alertMessage = message
         }

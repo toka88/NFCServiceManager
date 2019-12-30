@@ -20,7 +20,7 @@ extension NFCNDEFMessage {
 
         var result: String = ""
         for payload in self.records {
-            print("typeNameFormat: \(payload.typeNameFormat.rawValue)")
+            debugPrint("[NFCNDEFMessage text] typeNameFormat: \(payload.typeNameFormat.rawValue)")
             switch payload.typeNameFormat {
             case .nfcWellKnown:
                 if let text = payload.wellKnownTypeTextPayload().0 {
