@@ -54,27 +54,27 @@ public final class NFCServiceManager: NSObject {
     private var messageToWrite: NFCNDEFMessage?
 
     /// Singleton instance
-    static let shared: NFCServiceManager = NFCServiceManager()
+    public static let shared: NFCServiceManager = NFCServiceManager()
 
     /// Check does this device support NFC service
-    var isNFCSupported: Bool {
+    public var isNFCSupported: Bool {
         let answer = NFCNDEFReaderSession.readingAvailable
         return answer
     }
 
     /// Is NFC readed started
-    var isScanning: Bool {
+    public var isScanning: Bool {
         return completionBlock != nil
     }
 
     /// Is NFC writing started
-    var isWriting: Bool {
+    public var isWriting: Bool {
         return writingCompletionBlock != nil
     }
 
 
     /// Stop scanning for NFC tags.
-    func stopScanning() {
+    public func stopScanning() {
         readerSession?.invalidate()
         readerSession = nil
         completionBlock?(.failure(NFCServiceError.sessionStopped))
@@ -86,7 +86,7 @@ public final class NFCServiceManager: NSObject {
 
     /// Scan for NFC tags
     /// - Parameter completion: completion block
-    func scanTag(completion:@escaping ((Result<String, Error>) -> Void)) {
+    public func scanTag(completion:@escaping ((Result<String, Error>) -> Void)) {
         guard !isScanning else {
             completion(.failure(NFCServiceError.readSessionAlreadyStarted))
             return
@@ -105,7 +105,7 @@ public final class NFCServiceManager: NSObject {
     }
 
     @available(iOS 13.0, *)
-    func writeToTag(text: String, completion: @escaping ((Result<Bool, Error>) -> Void)) {
+    public func writeToTag(text: String, completion: @escaping ((Result<Bool, Error>) -> Void)) {
         guard !isScanning else {
             completion(.failure(NFCServiceError.readSessionAlreadyStarted))
             return
